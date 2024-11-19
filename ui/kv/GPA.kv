@@ -1,0 +1,46 @@
+<GPA_Screen>:
+    name: 'GPA'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: dp(10)
+
+        MDTopAppBar:
+            title: "GPA Calculator"
+            elevation: 4
+            padding: ["20dp", 0, "50dp", 0]
+            left_action_items: [["arrow-left", lambda x: app.switch_screen('hello')]]
+            pos_hint: {"top": 1}
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: dp(16)
+            spacing: dp(20)
+
+            MDTextField:
+                id: participation_score
+                hint_text: "Participation Score (10%)"
+                input_filter: 'float'
+                mode: "rectangle"
+
+            MDTextField:
+                id: midterm_score
+                hint_text: "Midterm Score (40%)"
+                input_filter: 'float'
+                mode: "rectangle"
+
+            MDTextField:
+                id: final_score
+                hint_text: "Final Exam Score (50%)"
+                input_filter: 'float'
+                mode: "rectangle"
+
+            MDRaisedButton:
+                text: "Calculate GPA"
+                pos_hint: {"center_x": .5}
+                on_press: root.calculate_gpa(participation_score.text, midterm_score.text, final_score.text)
+
+            MDLabel:
+                id: gpa_result
+                text: "Projected GPA: "
+                theme_text_color: 'Secondary'
+                halign: 'center'

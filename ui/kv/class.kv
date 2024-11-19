@@ -1,0 +1,43 @@
+<TopBar@MDBoxLayout>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: "56dp"
+    
+    MDTopAppBar:
+        title: "Class"
+        elevation: 4
+        padding: ["20dp", 0, "50dp", 0]
+        left_action_items: [["arrow-left", lambda x: app.switch_screen('hello')]]
+
+<TabSection@MDBoxLayout>:
+    orientation: "vertical"
+    
+    MDTabs:
+        id: tabs
+        on_tab_switch: app.on_tab_switch(*args)
+
+        Tab:
+            title: "Class Members"
+            icon: "account-group"
+            MDScrollView:
+                MDList:
+                    id: member_list
+                    padding: dp(10)
+                    spacing: dp(10)
+
+        Tab:
+            title: "Teachers"
+            icon: "school"
+            MDScrollView:
+                MDList:
+                    id: teacher_list
+                    padding: dp(10)
+                    spacing: dp(10)
+
+<ClassScreen>:
+    name: 'class'
+    
+    MDBoxLayout:
+        orientation: "vertical"
+        TopBar:
+        TabSection:

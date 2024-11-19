@@ -1,0 +1,166 @@
+#:kivy 1.2.0
+
+MDScreenManager:
+    id: account_manager
+    AccountScreen:
+        name: 'account'
+        manager: account_manager
+    EditProfileScreen:
+        name: 'edit_profile'
+        manager: account_manager
+
+<AccountScreen>:
+    name: "account"
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: [15, 20, 15, 15]
+        spacing: "20dp"
+        
+        MDTopAppBar:
+            title: "Profile"
+            elevation: 4
+            padding: ["20dp", 0, "50dp", 0]
+            left_action_items: [["arrow-left", lambda x: app.switch_screen('hello')]]
+            pos_hint: {"top": 1}
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: "200dp"
+            orientation: "vertical"
+            spacing: "10dp"
+            pos_hint: {"center_x": 0.5}
+
+            Image:
+                id: profile_image
+                source: root.profile_image_path
+                size_hint: None, None
+                size: "120dp", "120dp"
+                pos_hint: {"center_x": 0.5}
+
+            MDIconButton:
+                icon: "camera"
+                user_font_size: "24sp"
+                pos_hint: {"center_x": 0.5}
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.primary_color
+                on_release: root.change_avatar()
+
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: "15dp"
+            size_hint_y: None
+            height: "250dp"
+            
+            MDLabel:
+                id: name_label
+                text: "Name: "
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "40dp"
+
+            MDLabel:
+                id: dob_label
+                text: "Date of Birth: "
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "40dp"
+
+            MDLabel:
+                id: country_label
+                text: "Country: "
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "40dp"
+
+            MDLabel:
+                id: email_label
+                text: "Email: "
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "40dp"
+
+            MDLabel:
+                id: password_label
+                text: "Password: ************"
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "40dp"
+
+        Widget:
+            size_hint_y: 0.2
+
+        MDFillRoundFlatButton:
+            text: "Edit Profile"
+            pos_hint: {"center_x": 0.5}
+            size_hint_x: 0.8
+            on_release: root.edit_profile()
+
+<EditProfileScreen>:
+    name: "edit_profile"
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: [15, 20, 15, 15]
+        spacing: "20dp"
+
+        MDTopAppBar:
+            title: "Edit Profile"
+            left_action_items: [["arrow-left", lambda x: setattr(root.manager, 'current', 'account')]]
+            size_hint_y: None
+            height: "50dp"
+
+        MDBoxLayout:
+            orientation: "vertical"
+            spacing: "20dp"
+            padding: [10, 30, 10, 10]
+            
+            MDTextField:
+                id: name_field
+                hint_text: "Name"
+                mode: "rectangle"
+                size_hint_y: None
+                height: "50dp"
+
+            MDTextField:
+                id: dob_field
+                hint_text: "Date of Birth"
+                mode: "rectangle"
+                size_hint_y: None
+                height: "50dp"
+
+            MDTextField:
+                id: country_field
+                hint_text: "Country"
+                mode: "rectangle"
+                size_hint_y: None
+                height: "50dp"
+                on_focus: root.show_country_menu(self)
+
+            MDTextField:
+                id: email_field
+                hint_text: "Email"
+                mode: "rectangle"
+                size_hint_y: None
+                height: "50dp"
+
+            MDTextField:
+                id: password_field
+                hint_text: "Password"
+                password: True
+                mode: "rectangle"
+                size_hint_y: None
+                height: "50dp"
+
+            MDIconButton:
+                id: password_eye_icon
+                icon: "eye-off"
+                pos_hint: {"center_x": 0.5}
+                on_release: root.toggle_password_visibility()
+
+            Widget:
+                size_hint_y: 0.3
+
+            MDFillRoundFlatButton:
+                text: "Save changes"
+                pos_hint: {"center_x": 0.5}
+                size_hint_x: 0.8
+                on_release: root.save_changes()

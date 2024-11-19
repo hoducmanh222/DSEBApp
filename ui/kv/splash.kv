@@ -1,0 +1,23 @@
+<SplashScreen>:
+    name: 'splash'
+    MDFloatLayout:
+        
+        Image:
+            source: root.image_path
+            size_hint: .5, .5
+            size: "300dp", "300dp"
+            pos_hint: {'center_x': .5, 'center_y': .7}
+            allow_stretch: True
+            keep_ratio: True
+
+
+        MDLabel:
+            text: 'Welcome to DSEBApp'
+            halign: 'center'
+            font_style: 'H2'
+            theme_text_color: "Secondary"
+            
+        MDLabel:
+            text: root.loading_text
+            halign: "center"
+            pos_hint: {'center_y': .3}

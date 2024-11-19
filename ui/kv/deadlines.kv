@@ -1,0 +1,22 @@
+<DeadlinesScreen>:
+    name: 'deadlines'
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: dp(10)
+
+        MDTopAppBar:
+            title: "Deadlines"
+            elevation: 4
+            left_action_items: [["arrow-left", lambda x: app.switch_screen('hello')]]
+            right_action_items: [["plus", lambda x: root.show_add_deadline_dialog()]]
+            pos_hint: {"top": 1}
+
+        ScrollView:
+            id: deadline_scroll
+            MDBoxLayout:
+                id: deadline_box
+                orientation: "vertical"
+                spacing: "10dp"
+                padding: "10dp"
+                size_hint_y: None
+                height: self.minimum_height
