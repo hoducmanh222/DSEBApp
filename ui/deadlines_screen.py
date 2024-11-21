@@ -1,5 +1,5 @@
 from kivy.uix.screenmanager import Screen
-from kivy.properties import ObjectProperty
+from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
@@ -19,6 +19,7 @@ class DeadlinesScreen(Screen):
         super(DeadlinesScreen, self).__init__(**kwargs)
         self.dialog = None
         self.data = self.load_deadlines()
+        self.theme_cls = MDApp.get_running_app().theme_cls
 
     def on_enter(self):
         self.display_deadlines()
@@ -280,7 +281,11 @@ class DeadlinesScreen(Screen):
                 size_hint=(None, None),
                 size=(dp(90), dp(40)),
                 font_style='H6',
-                font_size='8sp'
+                font_size='8sp',
+                shorten=True,            # Enable text shortening
+                shorten_from='right',    # Truncate from right side
+                max_lines=1,            # Limit to one line
+                text_size=(dp(90), None)  # Set text wrapping width
             )
 
             edit_button = MDIconButton(
@@ -309,44 +314,125 @@ class DeadlinesScreen(Screen):
             
             self.ids.deadline_box.add_widget(main_card)
 
-    def toggle_deadline_details(self, card, deadline):
-        if card.expanded:
-            if card.content_card:
-                self.ids.deadline_box.remove_widget(card.content_card)
-                card.content_card = None
-            card.expanded = False
-        else:
-            # Create content card
-            content_card = MDCard(
-                orientation='vertical',
-                padding=dp(15),
-                size_hint_y=None,
-                height=dp(90),
-                md_bg_color=(0.98, 0.85, 0.80, 1)
-            )
-            
-            time_label = MDLabel(
-                text=f"Time: {deadline['time']}",
-                size_hint_y=None,
-                height=dp(30)
-            )
-            
-            content_label = MDLabel(
-                text=f"Details: {deadline['content']}",
-                size_hint_y=None,
-                height=dp(30)
-            )
-            
-            content_card.add_widget(time_label)
-            content_card.add_widget(content_label)
-            
-            # Insert content card after the main card
-            index = self.ids.deadline_box.children.index(card)
-            self.ids.deadline_box.add_widget(content_card, index)
-            
-            card.content_card = content_card
-            card.expanded = True
+    def toggle_deadline_details(self, instance, deadline):
+        content = MDBoxLayout(
+            orientation='vertical',
+            spacing=20,
+            padding=[20, 20, 20, 20],
+            size_hint_y=None,
+            height=400
+        )
+        
+        # Title section with icon
+        title_box = MDBoxLayout(
+            orientation='horizontal',
+            spacing=15,
+            adaptive_height=True,
+            padding=[0, 10, 0, 10]
+        )
+        
+        title_icon = MDIconButton(
+            icon="format-title",
+            theme_text_color="Custom",
+            text_color=self.theme_cls.primary_color,
+            font_size="24sp",
+            pos_hint={'center_y': 0.5}
+        )
+        
+        title = MDLabel(
+            text=deadline['name'],
+            theme_text_color="Primary",
+            font_style="H5",
+            adaptive_height=True,
+            pos_hint={'center_y': 0.5}
+        )
+    
+        title_box.add_widget(title_icon)
+        title_box.add_widget(title)
+        
+        # Date section with icon
+        date_box = MDBoxLayout(
+            orientation='horizontal',
+            spacing=15,
+            adaptive_height=True,
+            padding=[0, 10, 0, 10]
+        )
+        
+        date_icon = MDIconButton(
+            icon="calendar",
+            theme_text_color="Custom",
+            text_color=self.theme_cls.primary_color,
+            font_size="24sp",
+            pos_hint={'center_y': 0.5}
+        )
+        
+        date = MDLabel(
+            text=deadline['day'],
+            theme_text_color="Secondary",
+            adaptive_height=True,
+            pos_hint={'center_y': 0.5}
+        )
+    
+        date_box.add_widget(date_icon)
+        date_box.add_widget(date)
+        
+        # Description section with icon
+        desc_box = MDBoxLayout(
+            orientation='horizontal',
+            spacing=15,
+            adaptive_height=True,
+            padding=[0, 10, 0, 10]
+        )
+        
+        desc_icon = MDIconButton(
+            icon="text",
+            theme_text_color="Custom",
+            text_color=self.theme_cls.primary_color,
+            font_size="24sp",
+            pos_hint={'center_y': 0.5}
+        )
+        
+        description = MDLabel(
+            text=deadline['content'],
+            theme_text_color="Secondary",
+            adaptive_height=True,
+            pos_hint={'center_y': 0.5}
+        )
+        desc_box.add_widget(desc_icon)
+        desc_box.add_widget(description)
+        
+        separator1 = MDBoxLayout(
+            size_hint_y=None,
+            height="1dp",
+            md_bg_color=(1, 1, 1, 1)  # White color
+        )
+        separator2 = MDBoxLayout(
+            size_hint_y=None,
+            height="1dp",
+            md_bg_color=(1, 1, 1, 1)  # White color
+        )
+        
+        # Add all sections to main content
+        content.add_widget(title_box)
+        content.add_widget(separator1)
+        content.add_widget(date_box)
+        content.add_widget(separator2)
+        content.add_widget(desc_box)
 
+        self.dialog = MDDialog(
+            title="",
+            type="custom",
+            content_cls=content,
+            buttons=[
+                MDFlatButton(
+                    text="CLOSE",
+                    theme_text_color="Custom",
+                    on_release=self.close_dialog
+                )
+            ],
+            size_hint=(.8, None)
+        )
+        self.dialog.open()
     def close_dialog(self, *args):
         self.dialog.dismiss()
 
