@@ -1,3 +1,6 @@
+import os
+import json
+from kivy.properties import StringProperty, BooleanProperty
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -5,7 +8,6 @@ from kivymd.uix.list import OneLineAvatarIconListItem
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.button import MDFlatButton
 from kivy.metrics import dp
-from kivy.properties import StringProperty, BooleanProperty
 
 class ListItemWithCheckbox(OneLineAvatarIconListItem):
     note_id = StringProperty()
@@ -31,6 +33,7 @@ class ListItemWithCheckbox(OneLineAvatarIconListItem):
             if note['id'] == self.note_id:
                 note['completed'] = checkbox_instance.active
                 break
+        screen.on_checkbox_active(self.note_id, checkbox_instance.active)
 
     def edit_note(self):
         screen = self.parent.parent.parent.parent
@@ -47,10 +50,31 @@ class ListItemWithCheckbox(OneLineAvatarIconListItem):
 class Notes_Screen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.notes = []
+        self.notes = []  # Explicitly initialize as a list
         self.dialog = None
         self.title_field = None
         self.content_field = None
+        self.load_notes()  # Load notes when screen initializes
+
+    def load_notes(self):
+        try:
+            notes_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'notes.json')
+            if os.path.exists(notes_path):
+                with open(notes_path, 'r') as f:
+                    loaded_data = json.load(f)
+                    # Ensure loaded_data is a list
+                    self.notes = loaded_data if isinstance(loaded_data, list) else []
+                self.update_notes_list()
+        except Exception as e:
+            print(f"Error loading notes: {e}")
+            self.notes = []  # Fallback to empty list
+    def save_notes(self):
+        try:
+            notes_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'notes.json')
+            with open(notes_path, 'w') as f:
+                json.dump(self.notes, f, indent=4)
+        except Exception as e:
+            print(f"Error saving notes: {e}")
 
     def open_add_note_dialog(self):
         content = MDBoxLayout(
@@ -108,6 +132,7 @@ class Notes_Screen(MDScreen):
         }
         self.notes.append(note)
         self.update_notes_list()
+        self.save_notes()  
         self.dismiss_dialog()
 
     def update_notes_list(self):
@@ -178,11 +203,13 @@ class Notes_Screen(MDScreen):
             note['title'] = title
             note['content'] = content
             self.update_notes_list()
+            self.save_notes()  
             self.dismiss_dialog()
 
     def delete_note(self, note_id):
         self.notes = [n for n in self.notes if n['id'] != note_id]
         self.update_notes_list()
+        self.save_notes() 
 
     def view_note_dialog(self, note_id):
         note = next((n for n in self.notes if n['id'] == note_id), None)
@@ -205,3 +232,10 @@ class Notes_Screen(MDScreen):
         if self.dialog:
             self.dialog.dismiss()
             self.dialog = None
+
+    def on_checkbox_active(self, note_id, is_completed):
+        note = next((n for n in self.notes if n['id'] == note_id), None)
+        if note:
+            note['completed'] = is_completed
+            self.update_notes_list()
+            self.save_notes()  # Save notes after marking complete/incomplete
