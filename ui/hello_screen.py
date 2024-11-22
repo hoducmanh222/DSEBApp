@@ -38,14 +38,20 @@ class HelloScreen(MDScreen):
     def update_greeting(self):
         current_time = datetime.now().time()
         
-        try:
-            data_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'data.json')
-            with open(data_path, 'r') as f:
-                user_data = json.load(f)
-                username = user_data.get('username', 'User')
-        except FileNotFoundError:
-            username = self.manager.get_screen('login').ids.username.text
+        # try:
+        #     data_path = os.path.join(os.path.dirname(_file_), '..', 'data', 'data.json')
+        #     with open(data_path, 'r') as f:
+        #         user_data = json.load(f)
+        #         username = user_data.get('username', 'User')
+        # except FileNotFoundError:
+        #     username = self.manager.get_screen('login').ids.username.text
 
+        try:
+            username = self.manager.get_screen('login').ids.username_field.text
+            if not username.strip():
+                username = "Guest"  # Fallback if username is empty
+        except:
+            username = "Guest"  # Fallback if there's any error accessing username
 
         if current_time < datetime.strptime('12:00:00', '%H:%M:%S').time():
             greeting = "Good Morning"
