@@ -1,5 +1,7 @@
 # login_screen.py
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 import json
 import os
 from hashlib import sha256
@@ -13,13 +15,30 @@ class LoginScreen(MDScreen):
         super(LoginScreen, self).__init__(**kwargs)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         self.logo_path = os.path.join(current_dir, '..', 'photo', 'neulogo.jpg')
+        self.dialog = None
+
+    def show_error_dialog(self, message):
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title="Error",
+                text=message,
+                buttons=[
+                    MDFlatButton(
+                        text="OK",
+                        on_release=lambda x: self.dialog.dismiss()
+                    )
+                ]
+            )
+        else:
+            self.dialog.text = message
+        self.dialog.open()
     def login(self):
         try:
             username = self.ids.username_field.text.strip()
             password = self.ids.password_field.text.strip()
             
             if not username or not password:
-                self.ids.error_label.text = "Please fill all fields"
+                self.show_error_dialog("Username and password are required.")
                 return
                 
             data_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'data.json')
@@ -50,7 +69,7 @@ class LoginScreen(MDScreen):
                     return
 
             print("Invalid credentials")  # Debug
-            self.ids.error_label.text = "Invalid username or password"
+            self.show_error_dialog("Invalid credentials")
             
         except Exception as e:
             print(f"Login error: {str(e)}")  # Debug
